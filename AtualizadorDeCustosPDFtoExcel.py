@@ -2,32 +2,31 @@ import pandas as pd
 from pdfminer.high_level import extract_text
 from datetime import datetime
 
-arquivo = input("Digite o nome do arquivo PDF sem a extensão: ")
+arquivo = input("Digite o nome do arquivo PDF sem a extensão: ") 
 
 try:
-    texto = extract_text(arquivo + '.pdf')  #extraindo o texto do arquivo em pdf
+    texto = extract_text(arquivo + '.pdf')  # extraindo o texto do arquivo em pdf
 
-    tabela = pd.read_excel("codigos_original.xlsx")  #lendo o arquivo em excel e armazenando na variavel tabela
+    tabela = pd.read_excel("codigos_original.xlsx")  # lendo o arquivo em excel e armazenando em tabela
 
-    # contar quantas linhas temos na coluna código para saber a qtde de repetição do laço
+    # conta quantas linhas temos na coluna código para saber a quantidade de repetição do laço
     qtde_linhas = tabela["Código"].count()
     
-    i = 0  #variavel para inicialização do laço while
+    i = 0  # variavel para inicialização do laço while
 
-    while i < qtde_linhas:
+    while i < qtde_linhas:  # percorrer todos os códigos
         codigo = str(tabela.loc[i, "Código"])  # localizar o código [linha,coluna]
-        codigo = codigo.replace(" ", ".")  # substituir "espaço" por "."
+        codigo = codigo.replace(" ", ".")  # substituir "espaço" por "." (particularidade da empresa)
         
-        # para cada código da tabela, fazer uma busca no pdf
-        # se o codigo for encontrado no pdf
-        # percorrer a linha até encontrar o numero
-        # depois procura caracter numerico, armazena na string custo até achar o caractere |
+        # para cada código da tabela, faz uma busca no pdf
+        # se o codigo for encontrado no pdf, percorre a linha até encontrar os caracteres numericos
+        # armazena na string custo até achar o caractere | que é a condição de parada
         
         if codigo in texto:
             posicao_codigo = texto.find(codigo) + 20  # percorrendo pro campo que está 20 caracteres após
             custo = ""
             while texto[posicao_codigo] != "|":  # condicao de parada
-                if texto[posicao_codigo] != " ":  # encontrou o caractere numerico
+                if texto[posicao_codigo] != " ":  # encontra o caractere numerico
                     custo = custo + texto[posicao_codigo]  # preenche a variavel custo com os caracteres numericos encontrados
                 posicao_codigo = posicao_codigo + 1  # pula pro proximo caractere
             custo = custo.replace(".", "")  # onde for '.' vai retirar
@@ -44,4 +43,4 @@ try:
 except FileNotFoundError as error:
     print(error)
 except:
-    print("Erro no código. Entrar em contato com o desenvolvedor.")
+    print("Erro. Entrar em contato com o desenvolvedor.")
